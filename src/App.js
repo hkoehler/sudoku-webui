@@ -172,10 +172,14 @@ class ControlPanel extends Component {
 
     render() {
         var erase = this.props.onEraseClick
+        var newGame = this.props.onNewClick
         return (
             <div className="ControlPanel">
             <button type="button" className="EraseButton" onClick={erase}>
                 Erase
+            </button>
+            <button type="button" className="NewButton" onClick={newGame}>
+                New
             </button>
             </div>
         )
@@ -206,12 +210,54 @@ class App extends Component {
         this.onClick = this.onClick.bind(this);
         this.onNumPadClick = this.onNumPadClick.bind(this);
         this.onEraseClick = this.onEraseClick.bind(this);
+        this.onNewClick = this.onNewClick.bind(this);
         this.updateBoard = this.updateBoard.bind(this);
+        this.verifyMove = this.verifyMove.bind(this);
+        this.newBoard = this.newBoard.bind(this);
+    }
+
+    verifyMove(selectedRow, selectedCol, val) {
+        let board = this.state.board;
+        let boxRow = Math.floor(selectedRow/3) * 3
+        let boxCol = Math.floor(selectedCol/3) * 3
+
+        for (let col = 0; col < 9; col++) {
+            let v = board[selectedRow][col].val;
+            if (v === val) {
+                console.log("Invalid move - row conflict")
+                val = null;
+                return false;
+            }
+        }
+        for (let row = 0; row < 9; row++) {
+            let v = board[row][selectedCol].val;
+            if (v === val) {
+                console.log("Invalid move - column conflict")
+                val = null;
+                return false;
+            }
+        }
+        for (let row = boxRow; row < boxRow+3; row++) {
+            for (let col = boxCol; col < boxCol+3; col++) {
+                let v = board[row][col].val;
+                if (v === val) {
+                    console.log("Invalid move - box conflict")
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     updateBoard(selectedRow, selectedCol, val) {
         let newBoard = [];
         let board = this.state.board;
+
+        // verify move
+        if (val != null &&
+            this.verifyMove(selectedRow, selectedCol, val) === false) {
+                val = null;
+        }
 
         for (let row = 0; row < 9; row++) {
             let newRow = [];
@@ -226,14 +272,43 @@ class App extends Component {
             }
             newBoard.push(newRow);
         }
+        // update value of square
         if (val != null) {
-            if (val == 0) {
+            if (val === 0) {
                 newBoard[selectedRow][selectedCol].val = null;
             } else {
                 newBoard[selectedRow][selectedCol].val = val;
             }
         }
         return newBoard;
+    }
+
+    newBoard() {
+        // hard-code game for now
+        var puzzle = [
+            [3, 9, 6, 0, 8, 7, 0, 0, 4],
+       		[0, 2, 7, 0, 0, 4, 0, 6, 0],
+    		[1, 0, 4, 3, 0, 0, 0, 8, 7],
+	    	[0, 3, 2, 0, 7, 8, 0, 0, 0],
+	    	[0, 7, 8, 0, 4, 0, 9, 3, 0],
+	    	[0, 0, 5, 0, 0, 2, 0, 7, 0],
+	    	[2, 0, 3, 0, 0, 5, 4, 9, 6],
+		    [7, 0, 0, 0, 0, 0, 8, 1, 5],
+		    [5, 0, 0, 8, 0, 9, 7, 0, 0],
+        ];
+        let board = [];
+        for (let row = 0; row < 9; row++) {
+            let r = [];
+            for (let col = 0; col < 9; col++) {
+                let v = puzzle[row][col];
+                if (v === 0) {
+                    v = null;
+                }
+                r.push({selected: false, val: v});
+            }
+            board.push(r)
+        }
+        return board;
     }
 
     onClick(row, col) {
@@ -271,11 +346,20 @@ class App extends Component {
         console.log("Erase ", row, col);
     }
 
+    onNewClick() {
+        var newBoard = this.newBoard();
+        this.setState({
+            board : newBoard,
+            num: null,
+        });
+    }
+
     render() {
         return (
             <div>
             <h1 className="Header"> Sudoku </h1>
-            <ControlPanel onEraseClick={this.onEraseClick}/>
+            <ControlPanel onEraseClick={this.onEraseClick}
+                onNewClick={this.onNewClick}/>
             <Board onClick={this.onClick} board={this.state.board}/>
             <br/>
             <NumPad onClick={this.onNumPadClick} num={this.state.num}/>
