@@ -1,29 +1,15 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
-}
-
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
-}
-
-.App-intro {
-  font-size: large;
-}
-
 .Header {
     text-align: center;
 }
 
 td {
     text-align: center;
+}
+
+.ControlPanel {
+    margin: auto;
+    height: 50px;
+    width: 456px;
 }
 
 table.Board {
@@ -48,15 +34,40 @@ table.Box {
 td.Square {
     border: 1px solid black;
     background: white;
+    height: 50px;
+    width: 50px;
     margin: 0px;
     padding: 0px;
 }
 
 td.SquareSelected {
     border: 1px solid black;
-    background: #ffff80;
+    background: #c1c1c1;
+    height: 50px;
+    width: 50px;
     margin: 0px;
     padding: 0px;
+}
+
+table.NumPad {
+    margin: auto;
+    height: 50px;
+    width: 458px;
+    border-collapse: collapse;    
+}
+
+td.NumPad {
+    border: 2px solid black;
+    background: white;
+    margin: 0px;
+    padding: 0px;    
+}
+
+td.NumPadSelected {
+    border: 2px solid black;
+    background: #c1c1c1;
+    margin: 0px;
+    padding: 0px;    
 }
 
 @keyframes App-logo-spin {
