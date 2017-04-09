@@ -6,6 +6,22 @@ td {
     text-align: center;
 }
 
+.Button {
+    margin: 5px;
+    cursor: pointer;
+    display: inline-block;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: #EEE;
+    background-image: linear-gradient(#FCFCFC, #EEE);
+    border: 1px solid #D5D5D5;
+    border-radius: 3px;
+    font-weight: bold;
+    padding: 6px 10px;
+}
+
 .ControlPanel {
     margin: auto;
     height: 50px;
@@ -38,6 +54,20 @@ td.Square {
     width: 50px;
     margin: 0px;
     padding: 0px;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+td.SquareHighlighted {
+    border: 1px solid black;
+    background: white;
+    color: red;
+    height: 50px;
+    width: 50px;
+    margin: 0px;
+    padding: 0px;
+    font-size: 30px;
+    cursor: pointer;
 }
 
 td.SquareSelected {
@@ -47,6 +77,20 @@ td.SquareSelected {
     width: 50px;
     margin: 0px;
     padding: 0px;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+td.SquareSelectedHighlighted {
+    border: 1px solid black;
+    background: #c1c1c1;
+    color: red;
+    height: 50px;
+    width: 50px;
+    margin: 0px;
+    padding: 0px;
+    font-size: 30px;
+    cursor: pointer;
 }
 
 table.NumPad {
@@ -61,6 +105,8 @@ td.NumPad {
     background: white;
     margin: 0px;
     padding: 0px;    
+    font-size: 30px;
+    cursor: pointer;
 }
 
 td.NumPadSelected {
@@ -68,6 +114,8 @@ td.NumPadSelected {
     background: #c1c1c1;
     margin: 0px;
     padding: 0px;    
+    font-size: 30px;
+    cursor: pointer;
 }
 
 @keyframes App-logo-spin {

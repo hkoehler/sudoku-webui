@@ -1,7 +1,10 @@
 // (C) Copyright 2017, Heiko Koehler
 
 import React, { Component } from 'react';
+import { Button, Wrapper, Menu, MenuItem } from 'react-aria-menubutton';
+
 import './App.css';
+import './Menu.css';
 
 class Square extends Component {
     constructor(props) {
@@ -15,25 +18,32 @@ class Square extends Component {
     }
 
     render() {
-        var row = this.props.row
-        var col = this.props.col
-        var board = this.props.board
+        var row = this.props.row;
+        var col = this.props.col;
+        var board = this.props.board;
         var selected = board[row][col].selected;
-        var val = board[row][col].val
+        var highlighted = board[row][col].highlighted;
+        var val = board[row][col].val;
+        var className;
 
         if (selected) {
-            return (
-                <td className="SquareSelected" onClick={this.onClick}>
-                {val}
-                </td>
-            );
+            if (highlighted) {
+                className = "SquareSelectedHighlighted";
+            } else {
+                className = "SquareSelected";
+            }
         } else {
-            return (
-                <td className="Square" onClick={this.onClick}>
-                {val}
-                </td>
-            );
+            if (highlighted) {
+                className = "SquareHighlighted";
+            } else {
+                className = "Square";
+            }
         }
+        return (
+            <td className={className} onClick={this.onClick}>
+            {val}
+            </td>
+        );
     }
 }
 
@@ -134,6 +144,14 @@ class NumPadButton extends Component {
     }
 }
 
+function range(from, to) {
+    var a = [];
+    for (let i=from; i<=to; i++) {
+        a.push(i);
+    }
+    return a;
+}
+
 class NumPad extends Component {
     constructor(props) {
         super(props)
@@ -143,20 +161,15 @@ class NumPad extends Component {
     render() {
         var onClick = this.props.onClick;
         var selected = this.props.num;
+        var buttons = range(1, 9).map((i) => {
+            return <NumPadButton num={i} key={i} selected={selected} onClick={onClick}/>
+        });
 
         return (
             <table className="NumPad">
                 <tbody>
                     <tr>
-                        <NumPadButton num={1} selected={selected} onClick={onClick}/>
-                        <NumPadButton num={2} selected={selected} onClick={onClick}/>
-                        <NumPadButton num={3} selected={selected} onClick={onClick}/>
-                        <NumPadButton num={4} selected={selected} onClick={onClick}/>
-                        <NumPadButton num={5} selected={selected} onClick={onClick}/>
-                        <NumPadButton num={6} selected={selected} onClick={onClick}/>
-                        <NumPadButton num={7} selected={selected} onClick={onClick}/>
-                        <NumPadButton num={8} selected={selected} onClick={onClick}/>
-                        <NumPadButton num={9} selected={selected} onClick={onClick}/>
+                        {buttons}
                     </tr>
                 </tbody>
             </table>
@@ -164,25 +177,56 @@ class NumPad extends Component {
     }
 }
 
-class ControlPanel extends Component {
+class NewDropDown extends Component {
     constructor(props) {
-        super(props)
-        this.props = props
+        super(props);
+        this.props = props;
+        this.onSelection = this.onSelection.bind(this);
+    }
+
+    onSelection(val, event) {
+        console.log(val, event);
+        this.props.onClick();
     }
 
     render() {
-        var erase = this.props.onEraseClick
-        var newGame = this.props.onNewClick
+        const menuItemWords = ["Easy", "Medium", "Hard"];
+        const menuItems = menuItemWords.map((word, i) => {
+            return (
+                <li className="AriaMenuButton-menuItemWrapper" key={i}>
+                    <MenuItem className="AriaMenuButton-menuItem">
+                        {word}
+                    </MenuItem>
+                </li>
+            );
+        });
+
+        return <Wrapper className="AriaMenuButton" onSelection={this.onSelection}>
+            <Button className="AriaMenuButton-trigger"> New </Button>
+            <Menu>
+                <u1 className="AriaMenuButton-menu"> {menuItems} </u1>
+            </Menu>
+        </Wrapper>
+    }    
+}
+
+class ControlPanel extends Component {
+    constructor(props) {
+        super(props);
+        this.props = props;
+    }
+
+    render() {
+        var erase = this.props.onEraseClick;
+        var newGame = this.props.onNewClick;
         return (
             <div className="ControlPanel">
-            <button type="button" className="EraseButton" onClick={erase}>
-                Erase
-            </button>
-            <button type="button" className="NewButton" onClick={newGame}>
-                New
-            </button>
+                <NewDropDown onClick={newGame}/>
+                <button type="button" className="Button" onClick={erase}>
+                    Erase
+                </button>
             </div>
-        )
+        );
     }
 }
 
@@ -197,6 +241,7 @@ class App extends Component {
             for (let col = 0; col < 9; col++) {
                 board[row].push({
                     selected : false,
+                    highlighted: false,
                     value : null,
                 });
             }
@@ -252,10 +297,15 @@ class App extends Component {
     updateBoard(selectedRow, selectedCol, val) {
         let newBoard = [];
         let board = this.state.board;
+        let selectedVal = board[selectedRow][selectedCol].val;
 
         // verify move
         if (val != null &&
             this.verifyMove(selectedRow, selectedCol, val) === false) {
+                val = null;
+        }
+        if (val === 0 &&
+            board[selectedRow][selectedCol].given) {
                 val = null;
         }
 
@@ -267,6 +317,11 @@ class App extends Component {
                     square.selected = true;
                 } else {
                     square.selected = false;
+                }
+                if (selectedVal != null && square.val === selectedVal) {
+                    square.highlighted = true;
+                } else {
+                    square.highlighted = false;
                 }
                 newRow.push(square);
             }
@@ -301,10 +356,15 @@ class App extends Component {
             let r = [];
             for (let col = 0; col < 9; col++) {
                 let v = puzzle[row][col];
+                let g = false;
+
                 if (v === 0) {
                     v = null;
+                } else {
+                    g = true;
                 }
-                r.push({selected: false, val: v});
+                r.push({selected: false,
+                    val: v, given: g});
             }
             board.push(r)
         }
@@ -339,6 +399,7 @@ class App extends Component {
         var row = this.state.row
         var col = this.state.col
         var newBoard = this.updateBoard(row, col, 0);
+
         this.setState({
             board : newBoard,
             num: null,
